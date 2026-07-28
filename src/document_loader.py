@@ -2,6 +2,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import CharacterTextSplitter, RecursiveCharacterTextSplitter
 from langchain_experimental.text_splitter import SemanticChunker
 from langchain_ollama import OllamaEmbeddings
+from pathlib import Path
 
 def document_loader(chunk_methods):
 
@@ -36,5 +37,12 @@ def document_loader(chunk_methods):
       splitter = SemanticChunker(embeddings)
     
   chunked_documents = splitter.split_documents(raw_doc)
+
+  for i, doc in enumerate(chunked_documents, start=1):
+
+    doc.metadata = {
+      "chunk_id": f"{chunk_methods}-{i:02d}",
+      "source": f"{Path(doc.metadata.get("source")).name}"
+    }
 
   return chunked_documents
